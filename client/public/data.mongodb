@@ -1,0 +1,3 @@
+use("budget");
+
+db.general.find({});
