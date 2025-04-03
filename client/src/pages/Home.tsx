@@ -1,25 +1,14 @@
 import { useEffect, useState } from "react";
 import { getGradualColor } from "../utils/getGradualColor";
-import {
-  CardDetails,
-  DataManager,
-  Transaction,
-  TransactionType,
-} from "../data/mockData";
+import { CardDetails, DataManager, Transaction } from "../data/mockData";
 
 const dataManager = DataManager.getInstance();
 
 export const Home = () => {
   const [selectedCard, setSelectedCard] = useState<CardDetails>(" ");
 
-  const handleDelete = ({
-    name,
-    type,
-  }: {
-    name: string;
-    type: TransactionType;
-  }) => {
-    dataManager.deleteTransaction(type, name);
+  const handleDelete = ({ id }: { id: string }) => {
+    dataManager.deleteTransaction(id);
     const newKeyCard = Math.random();
     setKeyCard(newKeyCard);
   };
@@ -53,13 +42,7 @@ const Card = ({
   data: any;
   selectedCard: CardDetails;
   setSelectedCard: (card: CardDetails) => void;
-  handleDelete: ({
-    name,
-    type,
-  }: {
-    name: string;
-    type: TransactionType;
-  }) => void;
+  handleDelete: ({ id }: { id: string }) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(selectedCard == title);
   const percentage = (currentBalance / balance) * 100;
@@ -139,13 +122,7 @@ const TransactionCard = ({
   isOpen: boolean;
   transactions: Transaction[];
   totalConsumed: number;
-  handleDelete: ({
-    name,
-    type,
-  }: {
-    name: string;
-    type: TransactionType;
-  }) => void;
+  handleDelete: ({ id }: { id: string }) => void;
 }) => {
   return (
     <div
@@ -156,26 +133,41 @@ const TransactionCard = ({
     >
       {isOpen && (
         <div className="flex flex-col gap-4">
-          {transactions.map((transaction, index) => (
-            <div
-              key={index}
-              className="flex justify-between pl-9 items-center relative"
-            >
-              <span
-                onClick={() =>
-                  handleDelete({
-                    name: transaction.name,
-                    type: transaction.type,
-                  })
-                }
-                className="text-2xl font-bold absolute top-0 left-0 cursor-pointer"
+          {transactions.map((transaction, index) => {
+            let color = "#484848";
+            if (transaction.category == "Income") {
+              color = "#008000";
+            } else if (transaction.category == "Expense") {
+              color = "#ff0000";
+            }
+
+            return (
+              <div
+                key={index}
+                className="flex justify-between pl-9 items-center relative"
               >
-                *
-              </span>
-              <p>{transaction.name}</p>
-              <p>{transaction.amount}.00</p>
-            </div>
-          ))}
+                <span
+                  onClick={() =>
+                    handleDelete({
+                      id: transaction.id,
+                    })
+                  }
+                  className="text-2xl font-bold absolute top-0 left-0 cursor-pointer"
+                >
+                  *
+                </span>
+                <p>{transaction.name}</p>
+
+                <p style={{ color }} className={` `}>
+                  <span className="text-2xl font-semibold">
+                    {transaction.category == "Income" ? "+" : ""}
+                    {transaction.category == "Expense" ? "-" : ""}
+                  </span>{" "}
+                  {transaction.amount}.00
+                </p>
+              </div>
+            );
+          })}
           <div className="flex justify-end gap-6 items-center border-t-2 border-gray-300 pt-4 text-xl mb-2 absolute bottom-0 left-0 right-0 mx-4">
             <p>Total</p>
             <p>{totalConsumed}.00</p>

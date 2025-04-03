@@ -36,4 +36,7 @@ export class StorageService {
   setWants(wants: Transaction[]) {
     localStorage.setItem(StorageKeys.WANTS, JSON.stringify(wants));
   }
+  clearAll() {
+    localStorage.clear();
+  }
 }

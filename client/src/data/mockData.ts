@@ -1,44 +1,68 @@
 import { StorageService } from "../services/storageService";
 
 export type CardDetails = "Total Needs" | "Total Wants" | "Total Savings" | " ";
-export type TransactionType = "Needs" | "Wants" | "Savings";
-export const TransactionTypes: TransactionType[] = [
+export type TransactionBudget = "Needs" | "Wants" | "Savings";
+export type TransactionType = "Income" | "Expense" | "Savings";
+export const TransactionBudgets: TransactionBudget[] = [
   "Wants",
   "Needs",
   "Savings",
 ];
+
+export const fakeID = () => {
+  return Math.random().toString(36).substring(2, 15);
+};
+
 export interface Transaction {
+  id: string;
   amount: number;
   name: string;
   description: string;
-  type: TransactionType;
+  type: TransactionBudget;
+  category: TransactionType;
 }
 export const initialNeeds: Transaction[] = [
   {
+    id: "ff5c184s56h",
     amount: 1300,
     name: "Rent",
     description: "Rent for the month",
     type: "Needs",
+    category: "Expense",
   },
   {
+    id: "ff5c184s5dh",
     amount: 130,
     name: "Car Insurance",
     description: "Car Insurance for the month",
     type: "Needs",
+    category: "Expense",
   },
   {
+    id: "ff5cs84s56h",
     amount: 130,
+    name: "Car Insurance",
+    description: "Car Insurance for the month",
+    type: "Needs",
+    category: "Expense",
+  },
+  {
+    id: "ff5csd84s56h",
+    amount: 160,
     name: "Cell Phone",
     description: "Cell Phone for the month",
     type: "Needs",
+    category: "Income",
   },
 ];
 export const initialWants: Transaction[] = [
   {
+    id: "ff5cdd184s56h",
     amount: 80,
     name: "Gasoline",
     description: "2 times a week",
     type: "Wants",
+    category: "Expense",
   },
 ];
 export class DataManager {
@@ -52,28 +76,31 @@ export class DataManager {
   allWants: Transaction[] = [];
   savings = this.totalBalance * 0.1;
   currentsSavings = 0;
-  allSavings = [
+  allSavings: Transaction[] = [
     {
+      id: "ffwcdd184s56h",
       amount: 300,
       name: "Savings",
       description: "Savings for the month",
       type: "Savings",
+      category: "Savings",
     },
   ];
 
   private constructor() {
     const balanceFromStorage = StorageService.getInstance().getBalance();
-
-    this.totalBalance = balanceFromStorage || 2700;
+    // StorageService.getInstance().clearAll()
+    console.log(JSON.parse("null"));
+    this.totalBalance = balanceFromStorage || 3700;
     this.needs = this.totalBalance * 0.6;
     this.wants = this.totalBalance * 0.3;
     this.savings = this.totalBalance * 0.1;
     this.allNeeds =
-      StorageService.getInstance().getNeeds()?.length > 0
+      StorageService.getInstance().getNeeds() != null
         ? StorageService.getInstance().getNeeds()
         : initialNeeds;
     this.allWants =
-      StorageService.getInstance().getWants()?.length > 0
+      StorageService.getInstance().getWants() != null
         ? StorageService.getInstance().getWants()
         : initialWants;
   }
@@ -84,61 +111,116 @@ export class DataManager {
     return DataManager.instance;
   }
   getNeeds() {
-    const totalConsumed = this.allNeeds.reduce(
-      (acc, curr) => acc + curr.amount,
-      0
+    const { balance, totalConsumed, currentBalance } = this.calculateBalance(
+      this.allNeeds,
+      this.needs
     );
     return {
       title: "Total Needs",
-      balance: this.needs.toFixed(2),
-      currentBalance: this.needs - totalConsumed,
+      balance: balance,
+      currentBalance: currentBalance,
       transactions: this.allNeeds,
       totalConsumed,
       type: "Needs",
     };
   }
   getWants() {
-    const totalConsumed = this.allWants.reduce(
-      (acc, curr) => acc + curr.amount,
-      0
+    const { balance, totalConsumed, currentBalance } = this.calculateBalance(
+      this.allWants,
+      this.wants
     );
     return {
       title: "Total Wants",
-      balance: this.wants.toFixed(2),
-      currentBalance: this.wants - totalConsumed,
+      balance: balance,
+      currentBalance: currentBalance,
       transactions: this.allWants,
       totalConsumed,
       type: "Wants",
     };
   }
   getSavings() {
-    const totalConsumed = this.allSavings.reduce(
-      (acc, curr) => acc + curr.amount,
-      0
+    const { balance, totalConsumed, currentBalance } = this.calculateBalance(
+      this.allSavings,
+      this.savings
     );
     return {
       title: "Total Savings",
-      balance: this.savings.toFixed(2),
-      currentBalance: totalConsumed - this.savings,
+      balance: balance,
+      currentBalance: Math.abs(currentBalance),
+
       transactions: this.allSavings,
       totalConsumed,
       type: "Savings",
     };
   }
+  getSavings2() {
+    const { balance, totalConsumed, currentBalance } = this.calculateBalance(
+      this.allNeeds,
+      this.needs
+    );
+    return {
+      title: "Total Needs",
+      balance: balance,
+      currentBalance,
+
+      transactions: this.allNeeds,
+      totalConsumed,
+      type: "Savings",
+    };
+  }
+  calculateBalance(data: Transaction[], initialBalance: number) {
+    const total = data.reduce(
+      (acc, curr) => {
+        if (curr.category == "Income") {
+          acc.balance += curr.amount;
+        }
+        if (curr.category == "Expense") {
+          acc.totalConsumed += curr.amount;
+        }
+        if (curr.category == "Savings") {
+          acc.totalConsumed += curr.amount;
+        }
+
+        return acc;
+      },
+      {
+        totalConsumed: 0,
+
+        balance: Number(initialBalance.toFixed(2)),
+      }
+    );
+    return {
+      totalConsumed: total.totalConsumed,
+      balance: total.balance,
+      currentBalance: total.balance - total.totalConsumed,
+    };
+  }
+
   getResults() {
     return [this.getNeeds(), this.getWants(), this.getSavings()];
   }
-  addTransaction(
-    transaction: TransactionType,
-    amount: number,
-    name: string,
-    description = ""
-  ) {
+  addTransaction({
+    transaction,
+    amount,
+    name,
+    description = "",
+    category,
+    id,
+  }: {
+    transaction: TransactionBudget;
+    amount: number;
+    name: string;
+    description: string;
+    category: TransactionType;
+    id: string;
+  }) {
     const newTransaction: Transaction = {
       amount: Number(amount),
       name,
       description,
       type: transaction,
+      category: category,
+      id,
     };
     switch (transaction) {
       case "Needs":
@@ -165,18 +247,16 @@ export class DataManager {
     this.savings = this.totalBalance * 0.1;
     StorageService.getInstance().setBalance(balance);
   }
-  deleteTransaction(type: TransactionType, name: string) {
-    switch (type) {
-      case "Needs":
-        this.allNeeds = this.allNeeds.filter((t) => t.name !== name);
-        break;
-      case "Wants":
-        this.allWants = this.allWants.filter((t) => t.name !== name);
-    }
+  deleteTransaction(id: string) {
+    this.allNeeds = this.allNeeds.filter((t) => t.id !== id);
+
+    this.allWants = this.allWants.filter((t) => t.id !== id);
+
     this.saveData();
   }
   saveData() {
     StorageService.getInstance().setNeeds(this.allNeeds);
     StorageService.getInstance().setWants(this.allWants);
+    StorageService.getInstance().setBalance(this.totalBalance);
   }
 }
