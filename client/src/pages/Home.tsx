@@ -12,10 +12,6 @@ const dataManager = DataManager.getInstance();
 export const Home = () => {
   const [selectedCard, setSelectedCard] = useState<CardDetails>(" ");
 
-  useEffect(() => {
-    console.log("dataManager", dataManager);
-  }, [dataManager]);
-
   const handleDelete = ({
     name,
     type,
@@ -54,13 +50,7 @@ const Card = ({
   setSelectedCard,
   handleDelete,
 }: {
-  data: {
-    title: string;
-    balance: number;
-    currentBalance: number;
-    transactions: Transaction[];
-    totalConsumed: number;
-  };
+  data: any;
   selectedCard: CardDetails;
   setSelectedCard: (card: CardDetails) => void;
   handleDelete: ({

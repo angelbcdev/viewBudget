@@ -1,3 +1,5 @@
+import { StorageService } from "../services/storageService";
+
 export type CardDetails = "Total Needs" | "Total Wants" | "Total Savings" | " ";
 export type TransactionType = "Needs" | "Wants" | "Savings";
 export const TransactionTypes: TransactionType[] = [
@@ -31,22 +33,23 @@ const initialNeeds: Transaction[] = [
     type: "Needs",
   },
 ];
+const initialWants: Transaction[] = [
+  {
+    amount: 80,
+    name: "Gasoline",
+    description: "2 times a week",
+    type: "Wants",
+  },
+];
 export class DataManager {
   private static instance: DataManager;
-  totalBalance = 2700;
+  totalBalance = 0;
   needs = this.totalBalance * 0.6;
   currentsNeeds = 0;
-  allNeeds: Transaction[] = initialNeeds;
+  allNeeds: Transaction[] = [];
   wants = this.totalBalance * 0.3;
   currentsWants = 0;
-  allWants: Transaction[] = [
-    {
-      amount: 80,
-      name: "Gasoline",
-      description: "2 times a week",
-      type: "Wants",
-    },
-  ];
+  allWants: Transaction[] = [];
   savings = this.totalBalance * 0.1;
   currentsSavings = 0;
   allSavings = [
@@ -58,7 +61,16 @@ export class DataManager {
     },
   ];
 
-  private constructor() {}
+  private constructor() {
+    const balanceFromStorage = StorageService.getInstance().getBalance();
+
+    this.totalBalance = balanceFromStorage || 9999;
+    this.needs = this.totalBalance * 0.6;
+    this.wants = this.totalBalance * 0.3;
+    this.savings = this.totalBalance * 0.1;
+    this.allNeeds = StorageService.getInstance().getNeeds() || initialNeeds;
+    this.allWants = StorageService.getInstance().getWants() || initialWants;
+  }
   public static getInstance() {
     if (!DataManager.instance) {
       DataManager.instance = new DataManager();
@@ -120,6 +132,7 @@ export class DataManager {
       amount: Number(amount),
       name,
       description,
+      type: transaction,
     };
     switch (transaction) {
       case "Needs":
@@ -132,6 +145,7 @@ export class DataManager {
         this.allSavings.push(newTransaction);
         break;
     }
+    this.saveData();
   }
   clearAllTransactions() {
     this.allNeeds = initialNeeds;
@@ -143,6 +157,7 @@ export class DataManager {
     this.needs = this.totalBalance * 0.6;
     this.wants = this.totalBalance * 0.3;
     this.savings = this.totalBalance * 0.1;
+    StorageService.getInstance().setBalance(balance);
   }
   deleteTransaction(type: TransactionType, name: string) {
     switch (type) {
@@ -152,5 +167,10 @@ export class DataManager {
       case "Wants":
         this.allWants = this.allWants.filter((t) => t.name !== name);
     }
+    this.saveData();
+  }
+  saveData() {
+    StorageService.getInstance().setNeeds(this.allNeeds);
+    StorageService.getInstance().setWants(this.allWants);
   }
 }
