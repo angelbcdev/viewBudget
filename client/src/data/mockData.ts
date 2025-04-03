@@ -13,7 +13,7 @@ export interface Transaction {
   description: string;
   type: TransactionType;
 }
-const initialNeeds: Transaction[] = [
+export const initialNeeds: Transaction[] = [
   {
     amount: 1300,
     name: "Rent",
@@ -33,7 +33,7 @@ const initialNeeds: Transaction[] = [
     type: "Needs",
   },
 ];
-const initialWants: Transaction[] = [
+export const initialWants: Transaction[] = [
   {
     amount: 80,
     name: "Gasoline",
@@ -64,12 +64,18 @@ export class DataManager {
   private constructor() {
     const balanceFromStorage = StorageService.getInstance().getBalance();
 
-    this.totalBalance = balanceFromStorage || 9999;
+    this.totalBalance = balanceFromStorage || 2700;
     this.needs = this.totalBalance * 0.6;
     this.wants = this.totalBalance * 0.3;
     this.savings = this.totalBalance * 0.1;
-    this.allNeeds = StorageService.getInstance().getNeeds() || initialNeeds;
-    this.allWants = StorageService.getInstance().getWants() || initialWants;
+    this.allNeeds =
+      StorageService.getInstance().getNeeds()?.length > 0
+        ? StorageService.getInstance().getNeeds()
+        : initialNeeds;
+    this.allWants =
+      StorageService.getInstance().getWants()?.length > 0
+        ? StorageService.getInstance().getWants()
+        : initialWants;
   }
   public static getInstance() {
     if (!DataManager.instance) {
@@ -84,7 +90,7 @@ export class DataManager {
     );
     return {
       title: "Total Needs",
-      balance: this.needs,
+      balance: this.needs.toFixed(2),
       currentBalance: this.needs - totalConsumed,
       transactions: this.allNeeds,
       totalConsumed,
@@ -98,7 +104,7 @@ export class DataManager {
     );
     return {
       title: "Total Wants",
-      balance: this.wants,
+      balance: this.wants.toFixed(2),
       currentBalance: this.wants - totalConsumed,
       transactions: this.allWants,
       totalConsumed,
@@ -112,7 +118,7 @@ export class DataManager {
     );
     return {
       title: "Total Savings",
-      balance: this.savings,
+      balance: this.savings.toFixed(2),
       currentBalance: totalConsumed - this.savings,
       transactions: this.allSavings,
       totalConsumed,

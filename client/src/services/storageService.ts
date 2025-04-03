@@ -25,13 +25,13 @@ export class StorageService {
     localStorage.setItem(StorageKeys.BALANCE, JSON.stringify(balance));
   }
   getNeeds() {
-    return JSON.parse(localStorage.getItem(StorageKeys.NEEDS) || "[]");
+    return JSON.parse(localStorage.getItem(StorageKeys.NEEDS) || "null");
   }
   setNeeds(needs: Transaction[]) {
     localStorage.setItem(StorageKeys.NEEDS, JSON.stringify(needs));
   }
   getWants() {
-    return JSON.parse(localStorage.getItem(StorageKeys.WANTS) || "[]");
+    return JSON.parse(localStorage.getItem(StorageKeys.WANTS) || "null");
   }
   setWants(wants: Transaction[]) {
     localStorage.setItem(StorageKeys.WANTS, JSON.stringify(wants));
