@@ -6,7 +6,7 @@ export type TransactionType = "income" | "expense";
 
 // Interfaz para las transacciones
 export interface Transaction {
-  _id?: ObjectId;
+  id?: number;
   amount: number;
   description: string;
   date: Date;
@@ -52,7 +52,7 @@ export interface User {
 }
 
 export interface Category {
-  _id?: ObjectId;
+  id?: number;
   name: string;
   type: "needs" | "wants" | "savings";
   budget: number;

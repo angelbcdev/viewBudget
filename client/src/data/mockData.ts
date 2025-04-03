@@ -9,23 +9,26 @@ export interface Transaction {
   amount: number;
   name: string;
   description: string;
-  type?: TransactionType;
+  type: TransactionType;
 }
 const initialNeeds: Transaction[] = [
   {
     amount: 1300,
     name: "Rent",
     description: "Rent for the month",
+    type: "Needs",
   },
   {
     amount: 130,
     name: "Car Insurance",
     description: "Car Insurance for the month",
+    type: "Needs",
   },
   {
     amount: 130,
     name: "Cell Phone",
     description: "Cell Phone for the month",
+    type: "Needs",
   },
 ];
 export class DataManager {
@@ -41,6 +44,7 @@ export class DataManager {
       amount: 80,
       name: "Gasoline",
       description: "2 times a week",
+      type: "Wants",
     },
   ];
   savings = this.totalBalance * 0.1;
@@ -50,6 +54,7 @@ export class DataManager {
       amount: 300,
       name: "Savings",
       description: "Savings for the month",
+      type: "Savings",
     },
   ];
 
@@ -138,5 +143,14 @@ export class DataManager {
     this.needs = this.totalBalance * 0.6;
     this.wants = this.totalBalance * 0.3;
     this.savings = this.totalBalance * 0.1;
+  }
+  deleteTransaction(type: TransactionType, name: string) {
+    switch (type) {
+      case "Needs":
+        this.allNeeds = this.allNeeds.filter((t) => t.name !== name);
+        break;
+      case "Wants":
+        this.allWants = this.allWants.filter((t) => t.name !== name);
+    }
   }
 }

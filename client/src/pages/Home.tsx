@@ -1,13 +1,34 @@
 import { useEffect, useState } from "react";
 import { getGradualColor } from "../utils/getGradualColor";
-import { CardDetails, DataManager, Transaction } from "../data/mockData";
+import {
+  CardDetails,
+  DataManager,
+  Transaction,
+  TransactionType,
+} from "../data/mockData";
 
 const dataManager = DataManager.getInstance();
 
 export const Home = () => {
   const [selectedCard, setSelectedCard] = useState<CardDetails>(" ");
 
-  useEffect(() => {}, [selectedCard]);
+  useEffect(() => {
+    console.log("dataManager", dataManager);
+  }, [dataManager]);
+
+  const handleDelete = ({
+    name,
+    type,
+  }: {
+    name: string;
+    type: TransactionType;
+  }) => {
+    dataManager.deleteTransaction(type, name);
+    const newKeyCard = Math.random();
+    setKeyCard(newKeyCard);
+  };
+
+  const [keyCard, setKeyCard] = useState(0);
 
   return (
     <section className="relative p-4">
@@ -15,10 +36,11 @@ export const Home = () => {
       <div className="h-[490px] w-[105%] pr-4 overflow-hidden">
         {dataManager.getResults().map((data, index) => (
           <Card
-            key={index}
+            key={keyCard + index}
             data={data}
             selectedCard={selectedCard}
             setSelectedCard={setSelectedCard}
+            handleDelete={handleDelete}
           />
         ))}
       </div>
@@ -30,6 +52,7 @@ const Card = ({
   data: { title, balance, currentBalance, transactions, totalConsumed },
   selectedCard,
   setSelectedCard,
+  handleDelete,
 }: {
   data: {
     title: string;
@@ -40,11 +63,19 @@ const Card = ({
   };
   selectedCard: CardDetails;
   setSelectedCard: (card: CardDetails) => void;
+  handleDelete: ({
+    name,
+    type,
+  }: {
+    name: string;
+    type: TransactionType;
+  }) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(selectedCard == title);
   const percentage = (currentBalance / balance) * 100;
 
   const color = title == "Total Savings" ? "#fff" : getGradualColor(percentage);
+
   const getBGColor = () => {
     switch (title) {
       case "Total Needs":
@@ -92,6 +123,7 @@ const Card = ({
         isOpen={isOpen}
         transactions={transactions}
         totalConsumed={totalConsumed}
+        handleDelete={handleDelete}
       />
     </div>
   );
@@ -112,28 +144,49 @@ const TransactionCard = ({
   isOpen,
   transactions,
   totalConsumed,
+  handleDelete,
 }: {
   isOpen: boolean;
   transactions: Transaction[];
   totalConsumed: number;
+  handleDelete: ({
+    name,
+    type,
+  }: {
+    name: string;
+    type: TransactionType;
+  }) => void;
 }) => {
   return (
     <div
-      className={`w-full  bg-white rounded-md  gap-4 relative ${
-        isOpen ? "h-[350px]   opacity-100" : "h-0 opacity-0"
+      onClick={(e) => e.stopPropagation()}
+      className={`w-full bg-white rounded-md gap-4 relative ${
+        isOpen ? "h-[350px] opacity-100" : "h-0 opacity-0"
       } transition-all duration-300 my-4 p-4 linear`}
     >
       {isOpen && (
         <div className="flex flex-col gap-4">
-          {transactions.map((transaction, index) => {
-            return (
-              <div key={index} className="flex justify-between items-center">
-                <p>{transaction.name}</p>
-                <p>{transaction.amount}.00</p>
-              </div>
-            );
-          })}
-          <div className="flex justify-end gap-6 items-center border-t-2 border-gray-300 pt-4 text-xl mb-2 absolute bottom-0 left-0 right-0 mx-4 ">
+          {transactions.map((transaction, index) => (
+            <div
+              key={index}
+              className="flex justify-between pl-9 items-center relative"
+            >
+              <span
+                onClick={() =>
+                  handleDelete({
+                    name: transaction.name,
+                    type: transaction.type,
+                  })
+                }
+                className="text-2xl font-bold absolute top-0 left-0 cursor-pointer"
+              >
+                *
+              </span>
+              <p>{transaction.name}</p>
+              <p>{transaction.amount}.00</p>
+            </div>
+          ))}
+          <div className="flex justify-end gap-6 items-center border-t-2 border-gray-300 pt-4 text-xl mb-2 absolute bottom-0 left-0 right-0 mx-4">
             <p>Total</p>
             <p>{totalConsumed}.00</p>
           </div>
