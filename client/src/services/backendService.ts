@@ -2,11 +2,14 @@ import axios from "axios";
 import { config } from "../config/config";
 
 const readData = {
-  getAllData: config.serverUrl + "/api/getData",
-  saveData: config.serverUrl + "/api/saveData",
-};
+  getAllData: config.serverUrl
+    ? config.serverUrl + "/api/getData"
+    : window.location.origin + "/api/getData",
 
-console.log("readData", config);
+  saveData: config.serverUrl
+    ? config.serverUrl + "/api/saveData"
+    : window.location.origin + "/api/saveData",
+};
 
 export class BackendService {
   private static instance: BackendService;

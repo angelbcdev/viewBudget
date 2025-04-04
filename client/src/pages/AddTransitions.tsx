@@ -49,6 +49,12 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
       alert("Name is required");
       return;
     }
+
+    if (from === dataToAdd.type) {
+      alert("From and to cannot be the same");
+      return;
+    }
+
     const id = fakeID();
     if (!DataManager.instance) {
       alert("No data manager instance found");
@@ -65,16 +71,16 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
         id,
       });
     } else {
-      //desde donde
+      //desde donde se transfiere
       dataManager.addTransaction({
         transaction: from,
         amount: dataToAdd.amount,
         name: dataToAdd.name,
         description: dataToAdd.description,
-        category: "Expense",
+        category: "Loan",
         id,
       });
-      //asi se agrega la transferencia
+      //asia se agrega la transferencia
       dataManager.addTransaction({
         transaction: dataToAdd.type,
         amount: dataToAdd.amount,
@@ -120,17 +126,14 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
                   ? "bg-blue-800 text-white"
                   : "bg-gray-500 text-white opacity-50"
               } px-4 py-2 rounded-md`}
-              onClick={() =>
-                (type !== from || category === "Expense") &&
-                setDataToAdd({ ...dataToAdd, type })
-              }
+              onClick={() => setDataToAdd({ ...dataToAdd, type })}
             >
               {type}
             </button>
           ))}
         </div>
         {category !== "Expense" && (
-          <div className="flex flex-row gap-4 my-8">
+          <div className="flex flex-row gap-4 m">
             <span className="text-sm font-medium w-20">Desde</span>
             {TransactionBudgets.map((type2) => (
               <button
@@ -140,7 +143,7 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
                     ? "bg-blue-800 text-white"
                     : "bg-gray-500 text-white opacity-50"
                 } px-4 py-2 rounded-md`}
-                onClick={() => type2 !== dataToAdd.type && setFrom(type2)}
+                onClick={() => setFrom(type2)}
               >
                 {type2}
               </button>
@@ -148,7 +151,7 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
           </div>
         )}
       </div>
-      <div className="flex flex-row gap-4 m-8">
+      <div className="flex flex-row gap-4 mt-4">
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md mt-1"
           onClick={() =>
@@ -157,12 +160,12 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
               : setCategory("Expense")
           }
         >
-          {category === "Expense" ? "Gasto" : "Transferencia"}
+          {category !== "Expense" ? "Gasto" : "Transferencia"}
         </button>
       </div>
 
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-2"
+        className="bg-blue-500 text-white px-4 py-2 rounded-md my-2"
         onClick={handleAddTransaction}
       >
         Add Transaction

@@ -3,7 +3,7 @@ import { StorageService } from "../services/storageService";
 
 export type CardDetails = "Total Needs" | "Total Wants" | "Total Savings" | " ";
 export type TransactionBudget = "Needs" | "Wants" | "Savings";
-export type TransactionType = "Income" | "Expense" | "Savings";
+export type TransactionType = "Income" | "Expense" | "Savings" | "Loan";
 export const TransactionBudgets: TransactionBudget[] = [
   "Wants",
   "Needs",
@@ -182,6 +182,9 @@ export class DataManager {
         }
         if (curr.category == "Savings") {
           acc.totalConsumed += curr.amount;
+        }
+        if (curr.category == "Loan") {
+          acc.balance -= curr.amount;
         }
 
         return acc;
