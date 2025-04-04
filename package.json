@@ -7,7 +7,7 @@
     "build": "cd client && npm run build && cd ../server && npm run build",
     "server": "cd server && npx nodemon src/server.ts",
     "start": "cd server && node dist/server.js",
-    "dev": "cd server && npx nodemon src/server.ts"
+    "dev": "cd client && npm run dev "
   },
   "repository": {
     "type": "git",

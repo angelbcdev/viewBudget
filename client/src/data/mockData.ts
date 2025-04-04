@@ -2,7 +2,7 @@ import { BackendService } from "../services/backendService";
 import { StorageService } from "../services/storageService";
 
 export type CardDetails = "Total Needs" | "Total Wants" | "Total Savings" | " ";
-export type TransactionBudget = "Needs" | "Wants" | "Savings";
+export type TransactionBudget = "Needs" | "Wants" | "Savings" | " ";
 export type TransactionType = "Income" | "Expense" | "Savings" | "Loan";
 export const TransactionBudgets: TransactionBudget[] = [
   "Wants",

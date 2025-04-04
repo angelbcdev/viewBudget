@@ -11,7 +11,7 @@ import LayoutContainer from "../layouts/LayoutContainer";
 
 export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
   const [category, setCategory] = useState<TransactionType>("Expense");
-  const [from, setFrom] = useState<TransactionBudget>("Needs");
+  const [from, setFrom] = useState<TransactionBudget>(" ");
   const [dataToAdd, setDataToAdd] = useState<Transaction>({
     id: "",
     amount: Number(0),
@@ -30,6 +30,7 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
   };
 
   const clearData = () => {
+    setFrom(" ");
     setDataToAdd({
       id: "",
       amount: 0,
