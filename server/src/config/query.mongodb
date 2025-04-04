@@ -1,0 +1,34 @@
+use("finance_control");
+
+// db.budget.insertOne({
+//   needs: [],
+//   wants: [],
+//   balance: 0,
+// });
+
+// db.budget.updateOne(
+//   { _id: ObjectId("67ef0f258d6ff536e4d16e16") },
+//   { $set: { needs: [], wants: [], balance: 2700 } }
+// );
+
+// db.budget.find({ _id: ObjectId("67ef0f258d6ff536e4d16e16") });
+
+db.budget.updateOne(
+  { _id: ObjectId("67ef0f258d6ff536e4d16e16") },
+  {
+    $set: {
+      balance: 2700,
+      needs: [
+        {
+          id: "ff5c184s56h",
+          amount: 1300,
+          name: "Rent",
+          description: "Rent for the month",
+          type: "Needs",
+          category: "Expense",
+        },
+      ],
+      wants: [],
+    },
+  }
+);

@@ -1,3 +1,4 @@
+import { BackendService } from "../services/backendService";
 import { StorageService } from "../services/storageService";
 
 export type CardDetails = "Total Needs" | "Total Wants" | "Total Savings" | " ";
@@ -66,14 +67,14 @@ export const initialWants: Transaction[] = [
   },
 ];
 export class DataManager {
-  private static instance: DataManager;
+  static instance: DataManager;
   totalBalance = 0;
   needs = this.totalBalance * 0.6;
   currentsNeeds = 0;
-  allNeeds: Transaction[] = [];
+  allNeeds: Transaction[];
   wants = this.totalBalance * 0.3;
   currentsWants = 0;
-  allWants: Transaction[] = [];
+  allWants: Transaction[];
   savings = this.totalBalance * 0.1;
   currentsSavings = 0;
   allSavings: Transaction[] = [
@@ -86,27 +87,43 @@ export class DataManager {
       category: "Savings",
     },
   ];
+  showAllResults: any[] = [];
+  isUpdated = false;
 
   private constructor() {
-    const balanceFromStorage = StorageService.getInstance().getBalance();
-    // StorageService.getInstance().clearAll()
-    console.log(JSON.parse("null"));
-    this.totalBalance = balanceFromStorage || 3700;
+    this.totalBalance = 0;
+    this.allNeeds = [];
+    this.allWants = [];
+  }
+
+  updateResults({
+    needs,
+    wants,
+    balance,
+  }: {
+    needs: Transaction[];
+    wants: Transaction[];
+    balance: number;
+  }) {
+    DataManager.instance.totalBalance = balance || 0;
+    DataManager.instance.allNeeds = needs || [];
+    DataManager.instance.allWants = wants || [];
+    this.calculateBudget();
+    this.showAllResults = [this.getNeeds(), this.getWants(), this.getSavings()];
+    DataManager.instance.isUpdated = true;
+  }
+
+  calculateBudget() {
     this.needs = this.totalBalance * 0.6;
     this.wants = this.totalBalance * 0.3;
     this.savings = this.totalBalance * 0.1;
-    this.allNeeds =
-      StorageService.getInstance().getNeeds() != null
-        ? StorageService.getInstance().getNeeds()
-        : initialNeeds;
-    this.allWants =
-      StorageService.getInstance().getWants() != null
-        ? StorageService.getInstance().getWants()
-        : initialWants;
   }
+
   public static getInstance() {
     if (!DataManager.instance) {
       DataManager.instance = new DataManager();
+    } else {
+      // Update existing instance with new data
     }
     return DataManager.instance;
   }
@@ -153,21 +170,7 @@ export class DataManager {
       type: "Savings",
     };
   }
-  getSavings2() {
-    const { balance, totalConsumed, currentBalance } = this.calculateBalance(
-      this.allNeeds,
-      this.needs
-    );
-    return {
-      title: "Total Needs",
-      balance: balance,
-      currentBalance,
 
-      transactions: this.allNeeds,
-      totalConsumed,
-      type: "Savings",
-    };
-  }
   calculateBalance(data: Transaction[], initialBalance: number) {
     const total = data.reduce(
       (acc, curr) => {
@@ -197,7 +200,7 @@ export class DataManager {
   }
 
   getResults() {
-    return [this.getNeeds(), this.getWants(), this.getSavings()];
+    return this.showAllResults;
   }
   addTransaction({
     transaction,
@@ -255,8 +258,25 @@ export class DataManager {
     this.saveData();
   }
   saveData() {
-    StorageService.getInstance().setNeeds(this.allNeeds);
-    StorageService.getInstance().setWants(this.allWants);
-    StorageService.getInstance().setBalance(this.totalBalance);
+    // StorageService.getInstance().setNeeds(this.allNeeds);
+    // StorageService.getInstance().setWants(this.allWants);
+    // StorageService.getInstance().setBalance(this.totalBalance);
+
+    BackendService.getInstance().saveData({
+      needs: this.allNeeds,
+      wants: this.allWants,
+      balance: this.totalBalance,
+    });
+    this.isUpdated = false;
+  }
+  setNeeds(needs: Transaction[]) {
+    this.allNeeds = needs;
+  }
+  setWants(wants: Transaction[]) {
+    this.allWants = wants;
+  }
+  setBalance(balance: number) {
+    this.totalBalance = balance;
+    this.calculateBudget();
   }
 }

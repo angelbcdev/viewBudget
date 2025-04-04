@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getGradualColor } from "../utils/getGradualColor";
 import { CardDetails, DataManager, Transaction } from "../data/mockData";
+import Loader from "../components/TransactionForm/Loader";
+import { BackendService } from "../services/backendService";
 
 const dataManager = DataManager.getInstance();
 
@@ -11,24 +13,55 @@ export const Home = () => {
     dataManager.deleteTransaction(id);
     const newKeyCard = Math.random();
     setKeyCard(newKeyCard);
+    setDataM(false);
   };
 
   const [keyCard, setKeyCard] = useState(0);
+  const [dataM, setDataM] = useState(false);
+
+  useEffect(() => {
+    if (!dataManager.isUpdated) {
+      BackendService.getInstance()
+        .getAllData()
+        .then((data) => {
+          dataManager.updateResults(data);
+
+          setDataM(true);
+        });
+    } else {
+      setDataM(true);
+    }
+  }, [keyCard, dataM]);
 
   return (
     <section className="relative p-4">
-      <CardHeader title="Total " balance={dataManager.totalBalance} />
-      <div className="h-[490px] w-[105%] pr-4 overflow-hidden">
-        {dataManager.getResults().map((data, index) => (
-          <Card
-            key={keyCard + index}
-            data={data}
-            selectedCard={selectedCard}
-            setSelectedCard={setSelectedCard}
-            handleDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {dataM ? (
+        <>
+          <CardHeader title="Total " balance={dataManager.totalBalance} />
+          <div className="h-[490px] w-[105%] pr-4 overflow-hidden">
+            {dataManager.getResults().map((data, index) => (
+              <Card
+                key={keyCard + index}
+                data={data}
+                selectedCard={selectedCard}
+                setSelectedCard={setSelectedCard}
+                handleDelete={handleDelete}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <Loader />
+      )}
+      {/* <button
+        className="bg-blue-500 text-white p-2 rounded-md absolute bottom-4 right-12 z-50"
+        onClick={() => {
+          dataManager.isUpdated = false;
+          setDataM(false);
+        }}
+      >
+        Actualizar
+      </button> */}
     </section>
   );
 };
@@ -129,10 +162,10 @@ const TransactionCard = ({
       onClick={(e) => e.stopPropagation()}
       className={`w-full bg-white rounded-md gap-4 relative ${
         isOpen ? "h-[350px] opacity-100" : "h-0 opacity-0"
-      } transition-all duration-300 my-4 p-4 linear`}
+      } transition-all duration-300 my-4 p-4 linear `}
     >
       {isOpen && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 overflow-y-auto h-[280px]">
           {transactions.map((transaction, index) => {
             let color = "#484848";
             if (transaction.category == "Income") {
@@ -144,7 +177,7 @@ const TransactionCard = ({
             return (
               <div
                 key={index}
-                className="flex justify-between pl-9 items-center relative"
+                className="flex justify-between pl-9 items-center relative "
               >
                 <span
                   onClick={() =>

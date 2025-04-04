@@ -1,0 +1,22 @@
+{
+  "name": "financecontrol",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "server": "cd server && npx nodemon src/server.ts",
+    "start": "cd server && node dist/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angelbcdev/viewBudget.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angelbcdev/viewBudget/issues"
+  },
+  "homepage": "https://github.com/angelbcdev/viewBudget#readme",
+  "description": ""
+}

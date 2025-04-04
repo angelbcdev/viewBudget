@@ -17,11 +17,13 @@ export const DashboardPage = () => {
   return (
     <div>
       <Header />
+
       <main className=" bg-[#e9e6e6] ">
         {view === "Home" && <Home />}
         {view === "Add" && <AddTransitions returnView={returnView} />}
         {view === "Settings" && <Settings />}
       </main>
+
       <Footer {...{ view, setView }} />
     </div>
   );

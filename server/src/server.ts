@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import transactionRoutes from "./routes/transactionRoutes";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 app.use(cors());
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
   );
 });
 
+app.use("/api", transactionRoutes);
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

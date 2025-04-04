@@ -1,17 +1,9 @@
-// import { Router, Request, Response } from "express";
+import { Router } from "express";
+import { controllerApi } from "../controllers/controllerApi";
 
-// import { transactionController } from "../controllers/transactionController";
+const router = Router();
 
-// // Ahora tienes acceso a todos los tipos
-// interface CustomRequest extends Request {
-//   userId?: string;
-// }
+router.get("/getData", controllerApi.getAll);
+router.post("/saveData", controllerApi.saveData);
 
-// const router = Router();
-
-// router.get("/transactions", transactionController.getAll);
-// router.post("/transactions", transactionController.create);
-// router.get("/transactions/type/:type", transactionController.getByType);
-// router.get("/transactions/totals", transactionController.getTotals);
-
-// export default router;
+export default router;

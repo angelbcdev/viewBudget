@@ -18,6 +18,14 @@ export class StorageService {
     }
     return StorageService.instance;
   }
+
+  getAllData() {
+    return {
+      balance: this.getBalance(),
+      needs: this.getNeeds(),
+      wants: this.getWants(),
+    };
+  }
   getBalance() {
     return JSON.parse(localStorage.getItem(StorageKeys.BALANCE) || "0");
   }

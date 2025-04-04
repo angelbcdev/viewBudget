@@ -9,7 +9,6 @@ import {
 } from "../data/mockData";
 import LayoutContainer from "../layouts/LayoutContainer";
 
-const dataManager = DataManager.getInstance();
 export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
   const [category, setCategory] = useState<TransactionType>("Expense");
   const [from, setFrom] = useState<TransactionBudget>("Needs");
@@ -51,6 +50,11 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
       return;
     }
     const id = fakeID();
+    if (!DataManager.instance) {
+      alert("No data manager instance found");
+      return;
+    }
+    const dataManager = DataManager.instance;
     if (category == "Expense") {
       dataManager.addTransaction({
         transaction: dataToAdd.type,
@@ -62,7 +66,6 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
       });
     } else {
       //desde donde
-
       dataManager.addTransaction({
         transaction: from,
         amount: dataToAdd.amount,
@@ -107,7 +110,7 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
       />
       <div className="flex flex-col gap-4 my-2">
         <div className="flex flex-row gap-4 my-4">
-          <span className="text-sm font-medium w-20">asia</span>
+          <span className="text-sm font-medium w-20">Para</span>
 
           {TransactionBudgets.map((type) => (
             <button
@@ -128,7 +131,7 @@ export const AddTransitions = ({ returnView }: { returnView: () => void }) => {
         </div>
         {category !== "Expense" && (
           <div className="flex flex-row gap-4 my-8">
-            <span className="text-sm font-medium w-20">desde</span>
+            <span className="text-sm font-medium w-20">Desde</span>
             {TransactionBudgets.map((type2) => (
               <button
                 key={type2}
