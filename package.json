@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "init": "cd client && npm install && npm i --save-dev @types/node   && cd ../server && npm install && npm i --save-dev @types/node && cd ..",
     "build": "cd client && npm run build && cd ../server && npm run build",
     "server": "cd server && npx nodemon src/server.ts",
-    "start": "cd server && node dist/server.js"
+    "start": "cd server && node dist/server.js",
+    "dev": "cd server && npx nodemon src/server.ts"
   },
   "repository": {
     "type": "git",
