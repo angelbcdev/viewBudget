@@ -173,6 +173,9 @@ const TransactionCard = ({
             } else if (transaction.category == "Expense") {
               color = "#ff0000";
             }
+            if (transaction.category == "Loan") {
+              color = "#0000ff";
+            }
 
             return (
               <div
@@ -195,6 +198,7 @@ const TransactionCard = ({
                   <span className="text-2xl font-semibold">
                     {transaction.category == "Income" ? "+" : ""}
                     {transaction.category == "Expense" ? "-" : ""}
+                    {transaction.category == "Loan" ? "-" : ""}
                   </span>{" "}
                   {transaction.amount}.00
                 </p>
